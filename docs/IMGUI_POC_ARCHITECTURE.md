@@ -8,66 +8,7 @@ This PoC proves how an immediate-mode debug UI can be hosted by the existing eng
 
 ## High-level class diagram
 
-```mermaid
-classDiagram
-    class Game
-    class Engine
-    class DebugUISystem {
-        +addPanel(panel)
-        +init()
-        +renderFrame()
-        +shutdown()
-    }
-    class DebugPanel {
-        <<interface>>
-        +render()
-    }
-    class EntityInspectorPanel
-    class PerformancePanel
-    class RmlUiDebugPanel
-    class RmlUiDebugAdapter {
-        <<interface>>
-        +inspectElements() RmlUiElementInfo[]
-        +setElementVisible(entityId, elementId, visible) bool
-    }
-    class DemoRmlUiDebugAdapter
-    class FutureRmlUiDebugAdapter
-    class Scene
-    class Entity
-    class Component {
-        <<interface>>
-        +typeName()
-        +inspect(inspector)
-    }
-    class RmlUiElementComponent
-    class ComponentInspector {
-        <<interface>>
-        +addFloat(label, value)
-        +addInt(label, value)
-        +addBool(label, value)
-        +addText(label, value)
-    }
-    class ImGuiComponentInspector
-
-    Game --> Engine : owns host lifecycle
-    Game --> Scene : creates demo scene
-    Game --> DebugUISystem : owns debug UI
-    DebugUISystem o-- DebugPanel : owns panels
-    DebugPanel <|.. EntityInspectorPanel
-    DebugPanel <|.. PerformancePanel
-    DebugPanel <|.. RmlUiDebugPanel
-    Scene o-- Entity : owns entities
-    Entity o-- Component : owns components
-    Component <|.. RmlUiElementComponent
-    EntityInspectorPanel --> Scene : reads and inspects
-    Component --> ComponentInspector : describes editable data
-    ComponentInspector <|.. ImGuiComponentInspector
-    EntityInspectorPanel --> ImGuiComponentInspector : creates per render
-    RmlUiDebugPanel --> RmlUiDebugAdapter : reads diagnostics and requests fixes
-    RmlUiDebugAdapter <|.. DemoRmlUiDebugAdapter : current simulated adapter
-    RmlUiDebugAdapter <|.. FutureRmlUiDebugAdapter : implement after RmlUi integration
-    DemoRmlUiDebugAdapter --> Scene : reads and updates demo components
-```
+The up-to-date diagram of the implemented classes and external Dear ImGui/GLFW/OpenGL dependencies is in [IMGUI_POC_CLASS_DIAGRAM.md](IMGUI_POC_CLASS_DIAGRAM.md).
 
 ## Design choices
 

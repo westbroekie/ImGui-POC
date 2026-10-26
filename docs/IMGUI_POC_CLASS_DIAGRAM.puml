@@ -1,0 +1,193 @@
+@startuml Dear ImGui PoC Class Diagram
+
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam ArrowColor #475569
+skinparam ClassBorderColor #475569
+skinparam ClassBackgroundColor #F8FAFC
+skinparam ClassHeaderBackgroundColor #E2E8F0
+skinparam InterfaceBackgroundColor #EFF6FF
+skinparam InterfaceBorderColor #2563EB
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam package {
+    BorderColor #94A3B8
+    BackgroundColor #FFFFFF
+    FontColor #334155
+}
+
+title Dear ImGui Debug UI PoC - Class Diagram
+
+class "main()" as GameEntryPoint <<entry point>> {
+    Creates demo Scene and adapter
+    Registers panels with DebugUISystem
+    Runs the game and UI frame loop
+}
+
+class Engine {
+    +init()
+    +isRunning() : bool
+    +shutdown()
+}
+
+class DebugUISystem <<Facade>> {
+    +addPanel(panel)
+    +init()
+    +renderFrame()
+    +shouldClose() : bool
+    +shutdown()
+    -GLFWwindow* window
+    -vector~unique_ptr~DebugPanel~~ panels
+}
+
+interface DebugPanel {
+    +render()
+}
+
+class EntityInspectorPanel {
+    -Scene& scene
+    +render()
+}
+
+class PerformancePanel {
+    +render()
+}
+
+class RmlUiDebugPanel {
+    -RmlUiDebugAdapter& adapter
+    -bool correctionFailed
+    +render()
+}
+
+class Scene {
+    -uint32 nextId
+    -vector~unique_ptr~Entity~~ entities
+    +createEntity(name) : Entity&
+    +entities()
+}
+
+class Entity {
+    -string name
+    -uint32 id
+    -vector~unique_ptr~Component~~ components
+    +addComponent(type) : Component&
+    +components()
+}
+
+interface Component {
+    +typeName() : string_view
+    +inspect(inspector)
+}
+
+class TransformComponent <<demo>> {
+    -float positionX
+    -float positionY
+    -float rotation
+    +typeName() : string_view
+    +inspect(inspector)
+}
+
+class RmlUiElementComponent <<simulated RmlUi state>> {
+    -string document
+    -string elementId
+    -bool visible
+    -bool active
+    +visible() : bool
+    +setVisible(visible)
+    +active() : bool
+    +inspect(inspector)
+}
+
+interface ComponentInspector {
+    +addFloat(label, value)
+    +addInt(label, value)
+    +addBool(label, value)
+    +addText(label, value)
+}
+
+class ImGuiComponentInspector {
+    +addFloat(label, value)
+    +addInt(label, value)
+    +addBool(label, value)
+    +addText(label, value)
+}
+
+interface RmlUiDebugAdapter {
+    +inspectElements() : vector~RmlUiElementInfo~
+    +setElementVisible(entityId, elementId, visible) : bool
+}
+
+class DemoRmlUiDebugAdapter <<demo adapter>> {
+    -Scene& scene
+    +inspectElements() : vector~RmlUiElementInfo~
+    +setElementVisible(entityId, elementId, visible) : bool
+}
+
+class RmlUiElementInfo <<diagnostic snapshot>> {
+    +entityId : uint32
+    +entityName : string
+    +document : string
+    +elementId : string
+    +visible : bool
+    +active : bool
+    +hasActiveHiddenIssue() : bool
+}
+
+package "External UI / Rendering Libraries" {
+    class "Dear ImGui" as DearImGui <<external library>>
+    class "ImGui GLFW backend" as ImGuiGlfwBackend <<backend>>
+    class "ImGui OpenGL3 backend" as ImGuiOpenGL3Backend <<backend>>
+    class GLFW <<external library>>
+    class OpenGL <<graphics API>>
+}
+
+GameEntryPoint ..> Engine : starts / stops
+GameEntryPoint ..> Scene : creates demo data
+GameEntryPoint ..> DemoRmlUiDebugAdapter : creates
+GameEntryPoint ..> DebugUISystem : runs UI loop
+
+DebugUISystem o-- "0..*" DebugPanel : owns registered panels
+DebugPanel <|.. EntityInspectorPanel
+DebugPanel <|.. PerformancePanel
+DebugPanel <|.. RmlUiDebugPanel
+
+Scene "1" *-- "0..*" Entity : owns
+Entity "1" *-- "0..*" Component : owns
+Component <|.. TransformComponent
+Component <|.. RmlUiElementComponent
+EntityInspectorPanel --> Scene : inspects
+Component ..> ComponentInspector : describes editable fields through
+ComponentInspector <|.. ImGuiComponentInspector
+EntityInspectorPanel ..> ImGuiComponentInspector : creates per render
+
+RmlUiDebugAdapter <|.. DemoRmlUiDebugAdapter
+RmlUiDebugPanel --> RmlUiDebugAdapter : inspects / requests corrections
+DemoRmlUiDebugAdapter --> Scene : reads / updates demo data
+DemoRmlUiDebugAdapter ..> RmlUiElementInfo : returns snapshots
+DemoRmlUiDebugAdapter ..> RmlUiElementComponent : finds demo elements
+
+DebugUISystem ..> DearImGui : context and frame lifecycle
+DebugUISystem ..> ImGuiGlfwBackend : input / window integration
+DebugUISystem ..> ImGuiOpenGL3Backend : renders draw data
+ImGuiGlfwBackend ..> GLFW : uses
+ImGuiOpenGL3Backend ..> OpenGL : uses
+ImGuiComponentInspector ..> DearImGui : draws controls
+EntityInspectorPanel ..> DearImGui : draws tree and window
+PerformancePanel ..> DearImGui : draws metrics
+RmlUiDebugPanel ..> DearImGui : draws diagnostics / button
+
+note bottom of GameEntryPoint
+  GameEntryPoint is the main() function in game/src/main.cpp,
+  not a separately declared C++ class.
+end note
+
+note bottom of DemoRmlUiDebugAdapter
+  This adapter works against simulated ECS state.
+  It does not connect to a live RmlUi context.
+end note
+
+@enduml

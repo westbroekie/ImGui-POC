@@ -122,7 +122,7 @@ Configureer je het project met `cmake --preset debug` terwijl `VCPKG_ROOT` niet 
 
 De Dear ImGui-PoC gebruikt GLFW en OpenGL 3. De benodigde dependencies worden via vcpkg uit `vcpkg.json` geïnstalleerd. Op Windows staan sanitizers standaard uit om te voorkomen dat executables zonder de vereiste Clang AddressSanitizer-runtime niet starten. Op Linux en macOS staan ze standaard aan; CI test sanitizers apart op Linux.
 
-De architectuur, het klassendiagram, de RmlUi-aansluitgrens en de beperkingen van de simulatie staan in [docs/IMGUI_POC_ARCHITECTURE.md](docs/IMGUI_POC_ARCHITECTURE.md).
+Het klassendiagram staat in [docs/IMGUI_POC_CLASS_DIAGRAM.md](docs/IMGUI_POC_CLASS_DIAGRAM.md). De designkeuzes, RmlUi-aansluitgrens en beperkingen van de simulatie staan in [docs/IMGUI_POC_ARCHITECTURE.md](docs/IMGUI_POC_ARCHITECTURE.md).
 
 Debug-build:
 
