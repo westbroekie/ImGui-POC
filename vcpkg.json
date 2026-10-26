@@ -1,5 +1,16 @@
 {
     "name": "project-systems-programming",
     "version": "0.1.0",
-    "dependencies": []
+    "dependencies": [
+        {
+            "name": "glfw3"
+        },
+        {
+            "name": "imgui",
+            "features": [
+                "glfw-binding",
+                "opengl3-binding"
+            ]
+        }
+    ]
 }

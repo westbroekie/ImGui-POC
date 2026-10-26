@@ -120,6 +120,10 @@ Configureer je het project met `cmake --preset debug` terwijl `VCPKG_ROOT` niet 
 
 **Waarschuwing voor CLion**: installeer zelf een compiler, zoals MSVC of MinGW, of gebruik geen Terminal, maar de build- en load-knoppen in CLion zelf.
 
+De Dear ImGui-PoC gebruikt GLFW en OpenGL 3. De benodigde dependencies worden via vcpkg uit `vcpkg.json` geïnstalleerd. Op Windows staan sanitizers standaard uit om te voorkomen dat executables zonder de vereiste Clang AddressSanitizer-runtime niet starten. Op Linux en macOS staan ze standaard aan; CI test sanitizers apart op Linux.
+
+De architectuur, het klassendiagram, de RmlUi-aansluitgrens en de beperkingen van de simulatie staan in [docs/IMGUI_POC_ARCHITECTURE.md](docs/IMGUI_POC_ARCHITECTURE.md).
+
 Debug-build:
 
 Eenmalig:
@@ -130,6 +134,12 @@ cmake --preset debug
 Daarna om te bouwen:
 ```bash
 cmake --build --preset debug
+```
+
+Start daarna de game-executable om de Dear ImGui-demo te openen. Met een bestaande build-cache kun je de Windows-instelling expliciet vernieuwen met:
+
+```powershell
+cmake --preset debug -DENGINE_ENABLE_SANITIZERS=OFF
 ```
 
 Release-build:

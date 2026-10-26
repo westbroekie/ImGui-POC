@@ -17,7 +17,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(ENGINE_BUILD_TESTS "Build tests" ON)
-option(ENGINE_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" ON)
+
+if(WIN32)
+    set(ENGINE_SANITIZERS_DEFAULT OFF)
+else()
+    set(ENGINE_SANITIZERS_DEFAULT ON)
+endif()
+
+option(ENGINE_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" ${ENGINE_SANITIZERS_DEFAULT})
 
 add_library(project_warnings INTERFACE)
 

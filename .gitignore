@@ -14,6 +14,7 @@ rules.ninja
 
 # vcpkg
 vcpkg_installed/
+imgui.ini
 
 # IDE files
 .vscode/
